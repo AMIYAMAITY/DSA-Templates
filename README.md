@@ -10,12 +10,24 @@
 8. [Fast and Slow pointer (Linked List Cycle)](#SECTION-ID-8)
 9. [Sliding Window](#SECTION-ID-9)
 10. [Prefix Sum](#SECTION-ID-10)
-11. [Three Sum](#SECTION-ID-11)
-12. [Interval](#SECTION-ID-12)
-13. [Knapsack problem](#SECTION-ID-13)
-14. [Unbounded Knapsack](#SECTION-ID-14)
-15. [LCS](#SECTION-ID-15)
-16. [LPS](#SECTION-ID-16)
+11. [Two Pointer](#SECTION-ID-11)
+12. [Monotonic Stack](#SECTION-ID-18)
+13. [Interval](#SECTION-ID-12)
+14. [Knapsack problem](#SECTION-ID-13)
+15. [Unbounded Knapsack](#SECTION-ID-14)
+16. [LCS](#SECTION-ID-15)
+17. [LPS](#SECTION-ID-16)
+18. [DP on Stock](#SECTION-ID-17)
+19. [Subset Sum](#SECTION-ID-19)
+20. Longest Increasing Subsequence (LIS)
+21. DP on square
+22. Backtracking
+23. Top ‘K’ Elements
+24. Depth-First Search (DFS)
+25. Breadth-First Search (BFS)
+26. Topo Sort
+27. Disjoint Set
+28. Tries
 
 
 <!-- <details>
@@ -323,7 +335,7 @@
   ```
   [Top](#SECTION-ID-TOP)
 
-* Two pointer <a id="SECTION-ID-11"></a>
+* Two Pointer <a id="SECTION-ID-11"></a>
     - Three Sum [Problem](https://leetcode.com/problems/3sum/)
   
   ```
@@ -363,6 +375,56 @@
   }
   ```
     [Top](#SECTION-ID-TOP)
+
+* Monotonic Stack  <a id="SECTION-ID-18"></a> [Problem](https://leetcode.com/problems/largest-rectangle-in-histogram/)
+  - Largest Rectangle in Histogram
+
+  ```
+  class Solution {
+  public:
+    int maxHitogram(vector<int> &row){
+            int n = row.size();
+            std::stack<int> st;
+            int leftSmallest[n];
+            int rightSmallest[n];
+
+            //find left smallest
+            for(int i=0; i<n;i++ ){
+                while(!st.empty() && row[st.top()] >= row[i] ){
+                    st.pop();
+                }
+
+                if(st.empty()) leftSmallest[i] = 0;
+                else leftSmallest[i] = st.top() +1;
+                st.push(i);
+            }
+
+
+            while(!st.empty()) st.pop();
+
+            //find right smallest
+            for(int i=n-1; i>=0;i-- ){
+                while(!st.empty() && row[st.top()] >= row[i]){
+                    st.pop();
+                }
+
+                if(st.empty()) rightSmallest[i] = n-1;
+                else rightSmallest[i] = st.top() -1;
+                st.push(i);
+            }
+
+            int maxArea = 0;
+            for(int i=0; i<n; i++){
+                maxArea = max(maxArea, (row[i] * (rightSmallest[i] - leftSmallest[i] + 1)));
+            }
+            return maxArea;
+        }
+        
+    int largestRectangleArea(vector<int>& heights) {
+        return maxHitogram(heights);
+    }
+  } ;
+  ```
 
 * Interval <a id="SECTION-ID-12"></a>
     - Insert [Problem](https://leetcode.com/problems/insert-interval/)
@@ -751,5 +813,193 @@
           vector<vector<int>> dp(n+1, vector<int>(n+1, -1));
           return topDown(n-1, n-1, s,t, dp);
       }
+    };
+  ```
+
+* DP on Stock <a id="SECTION-ID-17"></a> [Problem](https://leetcode.com/problems/best-time-to-buy-and-sell-stock-ii/description/)
+  - Best Time to Buy and Sell Stock II
+  
+  ```
+  class Solution {
+    public:
+
+    int helperTopDown(int i, int buy, int n,  vector<int>& prices, vector<vector<int>> &dp){
+        if(i == n) return 0;
+
+        if(dp[i][buy] != -1) return dp[i][buy];
+        //Eplore
+        if(buy){
+            // choice-1, i can buy current day stock
+            //choice -2, I can skip current day stock
+            int currDate = -prices[i] + helperTopDown(i+1, 0,n,prices, dp) ;
+            int skipCurrDate = helperTopDown(i+1, 1, n, prices, dp);
+            return dp[i][buy] = max(currDate, skipCurrDate);
+        }else{
+            // choice-1, i can sell current day stock
+            //choice -2, I can skip current day stock
+            int currDate = prices[i] + helperTopDown(i+1, 1, n, prices, dp);
+            int skipCurrDate = 0 + helperTopDown(i+1, 0, n, prices, dp);
+            return dp[i][buy] = max(currDate, skipCurrDate);
+        }
+    }
+
+    int helperBottomUp(vector<int>& prices){
+        int n = prices.size();
+        vector<vector<int>> dp(n+1, vector<int>(2, 0));
+        dp[n][0] = dp[n][1] = 0;
+
+        for(int i=n-1; i>=0; i--){
+            for(int buy=0; buy<=1; buy++){
+                //Eplore
+                if(buy){
+                    // choice-1, i can buy current day stock
+                    //choice -2, I can skip current day stock
+                    int currDate = -prices[i] + dp[i+1][0];
+                    int skipCurrDate = dp[i+1][1];
+                    dp[i][buy] = max(currDate, skipCurrDate);
+                }else{
+                    // choice-1, i can sell current day stock
+                    //choice -2, I can skip current day stock
+                    int currDate = prices[i] + dp[i+1][1];
+                    int skipCurrDate = 0 + dp[i+1][0];
+                    dp[i][buy] = max(currDate, skipCurrDate);
+                }
+            }
+        }
+
+        return dp[0][1];
+
+    }
+
+    int helperBottomUpSpaceOptimization(vector<int>& prices){
+        int n = prices.size();
+        vector<int> prev(2, 0), curr(2, 0);
+
+        for(int i=n-1; i>=0; i--){
+            for(int buy=0; buy<=1; buy++){
+                //Eplore
+                if(buy){
+                    // choice-1, i can buy current day stock
+                    //choice -2, I can skip current day stock
+                    int currDate = -prices[i] + prev[0];
+                    int skipCurrDate = prev[1];
+                    curr[buy] = max(currDate, skipCurrDate);
+                }else{
+                    // choice-1, i can sell current day stock
+                    //choice -2, I can skip current day stock
+                    int currDate = prices[i] + prev[1];
+                    int skipCurrDate = 0 + prev[0];
+                    curr[buy] = max(currDate, skipCurrDate);
+                }
+            }
+            prev = curr;
+        }
+
+        return prev[1];
+
+    }
+
+
+    int maxProfit(vector<int>& prices) {
+        int n = prices.size();
+        return helperBottomUpSpaceOptimization(prices);
+        return helperBottomUp(prices);
+
+        vector<vector<int>> dp(n+1, vector<int>(2, -1));
+        return helperTopDown(0, 1, n, prices, dp);
+    }
   };
   ```
+  [Top](#SECTION-ID-TOP)
+
+* Subset Sum <a id="SECTION-ID-19"></a> [Problem](https://leetcode.com/problems/partition-equal-subset-sum/)
+    - Partition Equal Subset Sum
+
+  ```
+  class Solution {
+    public:
+    //Server loads problem also same
+    bool helperTopDown(int i, vector<int> &arr, int sum,  vector<vector<int>> &dp){
+        if(sum == 0) return true;
+        if( i == 0) return arr[0] == sum;
+        
+        
+        if(dp[i][sum] != -1) return (bool)dp[i][sum];
+        
+        bool notTake = (bool)helperTopDown(i-1, arr, sum, dp);
+        bool take = false;
+        if(sum >= arr[i])
+            take = (bool)helperTopDown(i-1, arr, sum-arr[i], dp);
+
+        return dp[i][sum] = (int)(take | notTake);
+        
+    }
+    
+    bool helperBottomUp(vector<int> &arr, int sum){
+        int n = arr.size();
+        vector<vector<bool>> dp(n+1, vector<bool>(sum+1, false));
+        
+        for(int i=0; i<n; i++) dp[i][0] = true;
+        dp[0][arr[0]] = true;
+        
+        for(int i=1; i<n; i++){
+            for(int target = 0; target <= sum; target++ ){
+                        
+                bool notTake = dp[i-1][target];
+                
+                bool take = false;
+                if(target >= arr[i])
+                    take = dp[i-1][target-arr[i]];
+                
+                dp[i][target] = (int)(take | notTake);
+            }
+        }
+        
+        return dp[n-1][sum];
+    }
+    
+    
+    bool helperBottomUpSpaceOptimization(vector<int> &arr, int sum){
+        int n = arr.size();
+        vector<bool> prev(sum+1, false);
+        
+        prev[0] = true;
+        if(arr[0] <= sum) prev[arr[0]] = true;
+        
+        for(int i=1; i<n; i++){
+            vector<bool> curr(sum+1, false);
+            curr[0] = true;
+
+            for(int target = 0; target <= sum; target++ ){
+                
+                bool notTake = prev[target];
+                bool take = false;
+                if(target >= arr[i])
+                    take = prev[target-arr[i]];
+                
+                curr[target] = (take | notTake);
+            }
+            prev = curr;
+        }
+        
+        return prev[sum];
+    }
+
+
+    bool canPartition(vector<int>& nums) {
+        int total=0;
+        int n = nums.size();
+        for(int i=0;i<n;i++) total += nums[i];
+        std::cout<<"total&1: "<<(total&1)<<std::endl;
+        if(total&1) return false; //Odd number never be segregated
+
+        int target = total/2;
+        return helperBottomUpSpaceOptimization(nums, target);
+
+
+        vector<vector<int>> dp(n, vector<int>(target+1, -1));
+        return solve(n - 1, target, nums,dp );;
+    }
+  };
+  ```
+  [Top](#SECTION-ID-TOP)
