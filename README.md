@@ -19,15 +19,18 @@
 17. [LPS](#SECTION-ID-16)
 18. [DP on Stock](#SECTION-ID-17)
 19. [Subset Sum](#SECTION-ID-19)
-20. Longest Increasing Subsequence (LIS)
-21. DP on square
-22. Backtracking
-23. Top ‘K’ Elements
-24. Depth-First Search (DFS)
-25. Breadth-First Search (BFS)
-26. Topo Sort
+20. [Longest Increasing Subsequence (LIS)](#SECTION-ID-20)
+21. [DP on square](#SECTION-ID-21)
+22. [Backtracking](#SECTION-ID-22)
+23. Depth-First Search (DFS)
+24. Breadth-First Search (BFS)
+25. Topo Sort
+26. Shortest path
 27. Disjoint Set
-28. Tries
+28. Top ‘K’ Elements
+29. Tries
+30. Powerset
+31. DP on Tree + Re-rooting
 
 
 <!-- <details>
@@ -73,21 +76,24 @@
 * Largest Sum Contiguous Subarray (Kadane’s Algorithm)<a id="SECTION-ID-2"></a> [Problem](https://leetcode.com/problems/maximum-subarray/solutions/5564535/simple-solution/)
   
   ```
-  int maxSubArraySum(int a[], int size)
-  {
-    int max_so_far = INT_MIN, max_ending_here = 0;
+    int maxSubArray(vector<int>& nums) {
+        long long curr_sum =0;
+        long long maximum_sum = INT_MIN;
 
-    for (int i = 0; i < size; i++) {
-      max_ending_here = max_ending_here + a[i];
-      if (max_so_far < max_ending_here)
-        max_so_far = max_ending_here;
+        for(int i=0;i<nums.size(); i++){
+            curr_sum += nums[i];
 
-      if (max_ending_here < 0)
-        max_ending_here = 0;
+            if(maximum_sum < curr_sum ){
+                maximum_sum = curr_sum;
+            }
+
+            if( curr_sum < 0){
+                curr_sum = 0;
+            }
+        }
+
+        return maximum_sum;
     }
-
-    return max_so_far;
-  }
   ```
   [Top](#SECTION-ID-TOP)
 
@@ -1001,5 +1007,184 @@
         return solve(n - 1, target, nums,dp );;
     }
   };
+  ```
+  [Top](#SECTION-ID-TOP)
+
+* Longest Increasing Subsequence (LIS) <a id="SECTION-ID-20"></a> [Problem](https://leetcode.com/problems/longest-increasing-subsequence/)
+    - Longest Increasing Subsequence (Length)
+
+    ```
+    int helperTopDown(int i, int prevIdx, vector<int>& nums, vector<vector<int>> &dp){
+        if(i == nums.size()) return 0;
+
+        if(dp[i][prevIdx+1] != -1) return dp[i][prevIdx+1];
+
+        //Explore
+        int notTake = 0 + helperTopDown(i+1, prevIdx, nums, dp);
+        int take = 0;
+        if(prevIdx == -1 || nums[i] > nums[prevIdx])
+            take = 1 + helperTopDown(i+1, i, nums, dp);
+        
+        return dp[i][prevIdx+1] = max(take, notTake);
+    }
+
+    return helperTopDown(0, -1, nums, dp);
+
+    ```
+
+    - Longest Increasing Subsequence (Using BS)(Length)
+  
+    ```
+    int binarySearch(vector<int>& nums){
+        vector<int> st;
+        for(int v: nums){
+            if(st.empty() || v > st[st.size() - 1])
+                st.push_back(v);
+            else{
+                //Find index of the first elemt of >= v
+                auto indx = lower_bound(st.begin(), st.end(), v);
+                *indx = v; //Overwrite the value, it doesn't means st store LIS. Just to save the space rewrite on same space.
+            }
+        }
+        return st.size(); //st doesn't contain LIS, it hust use space to store Length
+    }
+
+    return binarySearch(nums);
+    ```
+
+  - Longest Increasing Subsequence (Using Different Tabulation)(for Print and LDS)
+  
+  ```
+  
+    vector<int> LISDifferentWayWithTabulationPrintLDS(vector<int>& nums){
+        int n = nums.size();
+        vector<int> dp(n+1, 1);
+        int maxLen = 0;
+
+        vector<int> hash(n+1, 0);
+        int lastIndex = 0;
+
+        for(int i=0; i<n; i++){
+            hash[i] = i;
+            for(int prev = 0; prev < i; prev++){
+                // if(nums[i] > nums[prev] && dp[prev] + 1 > dp[prev]){ // This is for LIS condition
+                if(nums[i] % nums[prev] == 0 && dp[prev] + 1 > dp[i]){ //This is For LDS
+                    dp[i] = dp[prev] + 1;
+                    hash[i] = prev;
+                }
+            }
+            // maxLen = max(maxLen, dp[i]);
+            if(dp[i] > maxLen){
+                maxLen = dp[i];
+                lastIndex = i;
+            }
+        }
+
+        vector<int> res;
+        res.push_back(nums[lastIndex]);
+        
+        while(hash[lastIndex] != lastIndex){
+            lastIndex = hash[lastIndex];
+            res.push_back(nums[lastIndex]);
+        }
+
+        reverse(res.begin(), res.end());
+
+        return res;
+    }
+
+
+    //Driver code
+
+    int n = nums.size();
+    sort(nums.begin(), nums.end()); //After the sort this problem will be same is LIS only divisibility part need to be care
+    return LISDifferentWayWithTabulationPrintLDS(nums);
+  ```
+
+    [Top](#SECTION-ID-TOP)
+
+* DP on square <a id="SECTION-ID-21"></a> 
+  - Largest Rectangle in Histogram [Problem](https://leetcode.com/problems/largest-rectangle-in-histogram/description/)
+  
+  ```
+    class Solution {
+    public:
+        int maxHitogram(vector<int> &row){
+                int n = row.size();
+                std::stack<int> st;
+                int leftSmallest[n];
+                int rightSmallest[n];
+
+                //find left smallest
+                for(int i=0; i<n;i++ ){
+                    while(!st.empty() && row[st.top()] >= row[i] ){
+                        st.pop();
+                    }
+
+                    if(st.empty()) leftSmallest[i] = 0;
+                    else leftSmallest[i] = st.top() +1;
+                    st.push(i);
+                }
+
+
+                while(!st.empty()) st.pop();
+
+                //find right smallest
+                for(int i=n-1; i>=0;i-- ){
+                    while(!st.empty() && row[st.top()] >= row[i]){
+                        st.pop();
+                    }
+
+                    if(st.empty()) rightSmallest[i] = n-1;
+                    else rightSmallest[i] = st.top() -1;
+                    st.push(i);
+                }
+
+                int maxArea = 0;
+                for(int i=0; i<n; i++){
+                    maxArea = max(maxArea, (row[i] * (rightSmallest[i] - leftSmallest[i] + 1)));
+                }
+                return maxArea;
+            }
+            
+        int largestRectangleArea(vector<int>& heights) {
+            return maxHitogram(heights);
+        }
+    };
+  ```
+  [Top](#SECTION-ID-TOP)
+
+* Backtracking <a id="SECTION-ID-22"></a> 
+  - Combination Sum II  [Problem](https://leetcode.com/problems/combination-sum-ii/description/)
+
+  ```
+    class Solution {
+        public:
+        void solve(int idx, int target, vector<int>& candidates, vector<int>& ds, vector<vector<int>>& res){
+            
+            if(target == 0){
+                res.push_back(ds);
+                return;
+            }
+
+            for(int i=idx; i<candidates.size(); i++){
+                if(i > idx && candidates[i] == candidates[i-1]) continue;
+                
+                if(candidates[i] > target) break;
+                
+                ds.push_back(candidates[i]);
+                solve(i+1, target - candidates[i], candidates, ds, res);
+                ds.pop_back();
+            }
+        }
+
+        vector<vector<int>> combinationSum2(vector<int>& candidates, int target) {
+            vector<vector<int>> res;
+            vector<int> ds;
+            sort(candidates.begin(), candidates.end());
+            solve(0, target, candidates, ds, res);
+            return res;
+        }
+    };
   ```
   [Top](#SECTION-ID-TOP)
