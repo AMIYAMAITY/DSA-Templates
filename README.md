@@ -22,15 +22,14 @@
 20. [Longest Increasing Subsequence (LIS)](#SECTION-ID-20)
 21. [DP on square](#SECTION-ID-21)
 22. [Backtracking](#SECTION-ID-22)
-23. Depth-First Search (DFS)
-24. Breadth-First Search (BFS)
-25. Topo Sort
-26. Shortest path
-27. Disjoint Set
-28. Top ‘K’ Elements
-29. Tries
-30. Powerset
-31. DP on Tree + Re-rooting
+23. [Depth-First Search (DFS) && Breadth-First Search (BFS)](#SECTION-ID-23)
+24. [Topo Sort](#SECTION-ID-24)
+25. Shortest path
+26. Disjoint Set
+27. Top ‘K’ Elements
+28. Tries
+29. Powerset
+30. DP on Tree + Re-rooting
 
 
 <!-- <details>
@@ -1186,5 +1185,129 @@
             return res;
         }
     };
+  ```
+  [Top](#SECTION-ID-TOP)
+
+* Depth-First Search (DFS) && Breadth-First Search (BFS) <a id="SECTION-ID-23"></a> 
+  - Is Graph Bipartite?  [Problem](https://leetcode.com/problems/is-graph-bipartite/description/)
+
+  ```
+    class Solution {
+        public:
+        bool checkComponentBFS(int start, vector<vector<int>>& graph, vector<int>& color){
+
+            std::queue<int> q;
+            q.push(start);
+            color[start]= 0;
+
+
+            while(!q.empty()){
+                int node = q.front();
+                q.pop();
+
+                for(int a: graph[node]){
+                    if(color[a] == -1){
+                        color[a] = !color[node]; //opposite color
+                        q.push(a);
+                    }
+                    else if(color[a] == color[node]) {
+                        return false;
+                    }
+                }
+            }
+            return true;
+        }
+
+        bool checkComponentDFS(int start, int col, vector<vector<int>>& graph, vector<int>& color){
+            color[start] = col;
+
+            for(int a: graph[start]){
+                if(color[a] == -1){
+                    if(checkComponentDFS(a, !col, graph, color) == false) return false;
+                }
+                else if(color[a] == col) return false;
+            }
+
+            return true;
+        }
+
+        bool isBipartite(vector<vector<int>>& graph) {
+            std::vector<int> color(graph.size(), -1);
+            for(int i=0;i<graph.size(); i++){
+                if(color[i] == -1)
+                    // if(!checkComponentBFS(i, graph, color)) return false;
+                    if(checkComponentDFS(i, 0, graph, color) == false) return false;
+            }
+            return true;
+        }
+    };
+  ```
+  [Top](#SECTION-ID-TOP)
+
+* Toposort <a id="SECTION-ID-24"></a> 
+  - Toposort BFS (KAHN'S Algorithm)?  [Problem](https://www.geeksforgeeks.org/problems/topological-sort/1?utm_source=youtube&utm_medium=collab_striver_ytdescription&utm_campaign=topological-sort)
+
+  ```
+    vector<int> topoSortBFS(int V, vector<int> adj[]){
+        
+        vector<int> indegree(V, 0);
+		for (int i = 0; i < V; i++) {
+			for (int it : adj[i]) {
+				indegree[it]++;
+			}
+		}
+
+        std::queue<int> q;
+        for(int i=0; i<V; i++){
+            if(indegree[i] == 0) q.push(i);
+        }
+        
+        vector<int> topo;
+        while(!q.empty()){
+            int node = q.front();
+            q.pop();
+            topo.push_back(node);
+
+            for(int n: adj[node]){
+                indegree[n]--;
+                if(indegree[n] == 0) q.push(n);
+            }
+        }
+        
+        return topo;
+    }
+  ```
+
+  - Toposort DFS?  [Problem](https://www.geeksforgeeks.org/problems/topological-sort/1?utm_source=youtube&utm_medium=collab_striver_ytdescription&utm_campaign=topological-sort)
+
+  ```
+    void dfs(int src, vector<int> adj[], vector<bool> &visited, stack<int> &st){
+        visited[src] = true;
+        for(int u:adj[src]){
+            if(!visited[u]){
+                dfs(u, adj, visited, st);
+            }
+        }
+        st.push(src);
+    }
+
+    vector<int> topoSortDFS(int V, vector<int> adj[]){
+	    vector<int> res;
+	    vector<bool> visited(V, false);
+	    stack<int> st;
+
+	    for(int i=0;i<V; i++){
+	        if(!visited[i]){
+	            dfs(i, adj, visited, st);
+	        }
+	    }
+	    
+	    while(!st.empty()){
+	        res.push_back(st.top());
+	        st.pop();
+	    }
+	    
+	    return res;
+	}
   ```
   [Top](#SECTION-ID-TOP)
