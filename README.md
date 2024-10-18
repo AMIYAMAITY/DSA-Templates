@@ -27,9 +27,12 @@
 25. Shortest path
 26. Disjoint Set
 27. Top ‘K’ Elements
-28. Tries
-29. Powerset
-30. DP on Tree + Re-rooting
+28. Segment Tree
+29. Tries
+30. KMP algo / LPS(pi) array
+31. Powerset
+32. DP on Tree + Re-rooting
+33. Meet In The Middle
 
 
 <!-- <details>
