@@ -15,8 +15,8 @@
 13. [Interval](#SECTION-ID-12)
 14. [Knapsack problem](#SECTION-ID-13)
 15. [Unbounded Knapsack](#SECTION-ID-14)
-16. [LCS](#SECTION-ID-15)
-17. [LPS](#SECTION-ID-16)
+16. [LCS(Longest Common Subsequence)](#SECTION-ID-15)
+17. [LPS(Longest Palindromic Subsequence)](#SECTION-ID-16)
 18. [DP on Stock](#SECTION-ID-17)
 19. [Subset Sum](#SECTION-ID-19)
 20. [Longest Increasing Subsequence (LIS)](#SECTION-ID-20)
@@ -29,7 +29,7 @@
 27. Top ‘K’ Elements
 28. Segment Tree
 29. Tries
-30. KMP algo / LPS(pi) array
+30. [KMP algo & LPS(Longest Prefix Suffix) array](#SECTION-ID-30)
 31. Powerset
 32. DP on Tree + Re-rooting
 33. Meet In The Middle
@@ -653,7 +653,7 @@
   ```
   [Top](#SECTION-ID-TOP)
 
-* LCS <a id="SECTION-ID-15"></a> [Problem](https://leetcode.com/problems/longest-common-subsequence/)
+* LCS(Longest Common Subsequence) <a id="SECTION-ID-15"></a> [Problem](https://leetcode.com/problems/longest-common-subsequence/)
 
   ```
     class Solution {
@@ -742,7 +742,7 @@
   ```
   [Top](#SECTION-ID-TOP)
 
-* LPS <a id="SECTION-ID-16"></a> [Problem](https://leetcode.com/problems/longest-palindromic-subsequence/description/)
+* LPS(Longest Palindromic Subsequence) <a id="SECTION-ID-16"></a> [Problem](https://leetcode.com/problems/longest-palindromic-subsequence/description/)
 
   ```
     class Solution {
@@ -1312,5 +1312,62 @@
 	    
 	    return res;
 	}
+  ```
+  [Top](#SECTION-ID-TOP)
+
+* KMP algo & LPS(Longest Prefix Suffix) array <a id="SECTION-ID-30"></a> 
+  - 28. Find the Index of the First Occurrence in a String [Problem](https://leetcode.com/problems/find-the-index-of-the-first-occurrence-in-a-string/description/?envType=study-plan-v2&envId=top-interview-150)
+
+  ```
+  class Solution {
+    public:
+        std::vector<int> LPS(string& str){
+            int n = str.size();
+            std::vector<int> lps(n, 0);
+
+            int i=1, j=0;
+            while(i<n){
+                if(str[i] == str[j]){
+                    j += 1;
+                    lps[i] = j;
+                    i += 1;
+                }else{
+                    if(j!=0) j = lps[j-1];
+                    else{
+                        lps[i] = 0;
+                        i += 1;
+                    }
+                }
+            }
+            return lps;
+        }
+
+
+        int KMP(string haystack, string needle){
+            std::vector<int> lps = LPS(needle);
+            int i=0, j=0;
+            int n = haystack.size();
+            int m = needle.size();
+            
+            while(i<n && j < m){
+                if(haystack[i] == needle[j]){
+                    i += 1;
+                    j += 1;
+                }
+                else{
+                    if(j != 0) j = lps[j-1];
+                    else i += 1;
+                }                        
+            }
+
+            if(j == m) return i-m; // i-m because we need to return initial position
+            return -1;
+        }
+
+        int strStr(string haystack, string needle) {
+            if(haystack.size() < needle.size()) return -1;
+            return KMP(haystack, needle);
+        }
+    };
   ```
   [Top](#SECTION-ID-TOP)
