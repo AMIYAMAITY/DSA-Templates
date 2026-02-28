@@ -1,3 +1,9 @@
+***DSA Algo Types*** 
+<p align="left">
+  <img src="./assets/dsa.jpeg" alt="Algo Types">
+</p>
+
+
 ***DSA Templates*** <a id="SECTION-ID-TOP"></a>
 
 1. [Boyer-Moore Majority Voting Algorithm](#SECTION-ID-1)
