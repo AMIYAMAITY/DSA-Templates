@@ -6,39 +6,40 @@
 
 ***DSA Templates*** <a id="SECTION-ID-TOP"></a>
 
-1. [Boyer-Moore Majority Voting Algorithm](#SECTION-ID-1)
-2. [Largest Sum Contiguous Subarray (Kadane’s Algorithm)](#SECTION-ID-2)
-3. [SIEVE OF ERATOSTHENES ALGORITHM](#SECTION-ID-3)
-4. [Binary Search-1D](#SECTION-ID-4)
-5. [Binary Search-2D](#SECTION-ID-5)
-6. [Binary Search(Contidions bases)](#SECTION-ID-6)
-7. [Linked list-1 (Reverse a LinkedList [Iterative])](#SECTION-ID-7)
-8. [Fast and Slow pointer (Linked List Cycle)](#SECTION-ID-8)
-9. [Sliding Window](#SECTION-ID-9)
-10. [Prefix Sum](#SECTION-ID-10)
-11. [Two Pointer](#SECTION-ID-11)
-12. [Monotonic Stack](#SECTION-ID-18)
-13. [Interval](#SECTION-ID-12)
-14. [Knapsack problem](#SECTION-ID-13)
-15. [Unbounded Knapsack](#SECTION-ID-14)
-16. [LCS(Longest Common Subsequence)](#SECTION-ID-15)
-17. [LPS(Longest Palindromic Subsequence)](#SECTION-ID-16)
-18. [DP on Stock](#SECTION-ID-17)
-19. [Subset Sum](#SECTION-ID-19)
-20. [Longest Increasing Subsequence (LIS)](#SECTION-ID-20)
-21. [DP on square](#SECTION-ID-21)
-22. [Backtracking](#SECTION-ID-22)
-23. [Depth-First Search (DFS) && Breadth-First Search (BFS)](#SECTION-ID-23)
-24. [Topo Sort](#SECTION-ID-24)
-25. Shortest path
-26. Disjoint Set
-27. Top ‘K’ Elements
-28. Segment Tree
-29. Tries
-30. [KMP algo & LPS(Longest Prefix Suffix) array](#SECTION-ID-30)
-31. Powerset
-32. DP on Tree + Re-rooting
-33. Meet In The Middle
+- [Boyer-Moore Majority Voting Algorithm](#SECTION-ID-1)
+- [Largest Sum Contiguous Subarray (Kadane’s Algorithm)](#SECTION-ID-2)
+- [SIEVE OF ERATOSTHENES ALGORITHM](#SECTION-ID-3)
+- [Binary Search-1D](#SECTION-ID-4)
+- [Binary Search-2D](#SECTION-ID-5)
+- [Binary Search(Contidions bases)](#SECTION-ID-6)
+- [Linked list-1 (Reverse a LinkedList [Iterative])](#SECTION-ID-7)
+- [Fast and Slow pointer (Linked List Cycle)](#SECTION-ID-8)
+- [HashMap](#SECTION-ID-HASHMAP)
+- [Sliding Window](#SECTION-ID-9)
+- [Prefix Sum](#SECTION-ID-10)
+- [Two Pointer](#SECTION-ID-11)
+- [Monotonic Stack](#SECTION-ID-18)
+- [Interval](#SECTION-ID-12)
+- [Knapsack problem](#SECTION-ID-13)
+- [Unbounded Knapsack](#SECTION-ID-14)
+- [LCS(Longest Common Subsequence)](#SECTION-ID-15)
+- [LPS(Longest Palindromic Subsequence)](#SECTION-ID-16)
+- [DP on Stock](#SECTION-ID-17)
+- [Subset Sum](#SECTION-ID-19)
+- [Longest Increasing Subsequence (LIS)](#SECTION-ID-20)
+- [DP on square](#SECTION-ID-21)
+- [Backtracking](#SECTION-ID-22)
+- [Depth-First Search (DFS) && Breadth-First Search (BFS)](#SECTION-ID-23)
+- [Topo Sort](#SECTION-ID-24)
+- Shortest path
+- Disjoint Set
+- Top ‘K’ Elements
+- Segment Tree
+- Tries
+- [KMP algo & LPS(Longest Prefix Suffix) array](#SECTION-ID-30)
+- Powerset
+- DP on Tree + Re-rooting
+- Meet In The Middle
 
 
 <!-- <details>
@@ -282,6 +283,48 @@
   }
   ```
   [Top](#SECTION-ID-TOP)
+
+* HashMap  <a id="SECTION-ID-HASHMAP"></a> 
+  - Minimum Window Substring [Problem](https://leetcode.com/problems/minimum-window-substring/description/)
+  
+  ```
+  class Solution {
+    public:
+        string solve(string s, string t){
+            int sn = s.size();
+            int tn = t.size();
+            int r = 0, l = 0;
+            std::vector<int> mp(255,0);
+
+            for(char& c : t) mp[c]++;
+
+            int minLength = INT_MAX;
+            int startIdx = -1;
+            int count = 0;
+            while(r < sn){
+                if(mp[s[r]] > 0) count++;
+                mp[s[r]]--;
+
+                while(count == tn){
+                    if(minLength > r-l+1){
+                        minLength = min(minLength, r-l+1);
+                        startIdx = l;
+                    }
+
+                    mp[s[l]]++;
+                    if(mp[s[l]] > 0) count--;
+                    l++;
+                }
+                r++;
+            }
+            return startIdx == -1 ? "" : s.substr(startIdx, minLength);
+        }
+        string minWindow(string s, string t) {
+            return solve(s, t);
+        }
+    };
+  ```
+    [Top](#SECTION-ID-TOP)
 
 * Sliding Window  <a id="SECTION-ID-9"></a> 
   - Longest Repeating Character Replacement [Problem](https://leetcode.com/problems/longest-repeating-character-replacement/)
