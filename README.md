@@ -14,8 +14,8 @@
 - [Binary Search(Contidions bases)](#SECTION-ID-6)
 - [Linked list-1 (Reverse a LinkedList [Iterative])](#SECTION-ID-7)
 - [Fast and Slow pointer (Linked List Cycle)](#SECTION-ID-8)
-- [HashMap](#SECTION-ID-HASHMAP)
-- [Sliding Window](#SECTION-ID-9)
+- [HashMap](#SECTION-ID-HASHMAP) ([KEY NOTES](key_hashmap.md))
+- [Sliding Window](#SECTION-ID-9) ([KEY NOTES](key_sliding-window.md))
 - [Prefix Sum](#SECTION-ID-10)
 - [Two Pointer](#SECTION-ID-11)
 - [Monotonic Stack](#SECTION-ID-18)
@@ -41,7 +41,8 @@
 - DP on Tree + Re-rooting
 - Meet In The Middle
 
-
+Key thinking-
+Two 
 <!-- <details>
   <summary>Template list</summary>
 
