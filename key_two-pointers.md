@@ -6,7 +6,7 @@ I’ll keep it **concise, structured, and interview-oriented** so you can reuse 
 
 ## 📄 `key_two-pointers.md`
 
-````md
+
 # 🔑 Two Pointers - Pattern Recognition Guide
 
 Two pointers is a technique where we use **two indices** to traverse data efficiently, usually to reduce time complexity from O(n²) → O(n).
